@@ -1,22 +1,22 @@
 # Activity 11.1.4: Project 2 Plotting
 # File: Team_Exercise_4_Team10.py
 # Date: 3 March 2020
-# By: Full Name team member 1
-# Login ID
-# Full Name team member 2
-# Login ID
-# Full Name team member 3
-# Login ID
-# Full Name team member 4
-# Login ID
-# Section: Number
-# Team: Team Number
+# By: Pranav Anandarao
+# panandar
+# Joseph Kawiecki
+# jkawiec
+# Samuel Pike
+# pike16
+# Tomohisa Shinagawa
+# tshinaga
+# Section: 1
+# Team: 10
 #
 # ELECTRONIC SIGNATURE
-# Full Name team member 1
-# Full Name team member 2
-# Full Name team member 3
-# Full Name team member 4
+# Pranav Anandarao
+# Joseph Kawiecki
+# Samuel Pike
+# Tomohisa Shinagawa
 #
 # The electronic signatures above indicate that the program
 # submitted for evaluation is the combined effort of all
@@ -25,7 +25,9 @@
 # member of the team has a general understanding of
 # all aspects of the program development and execution.
 #
-# A BRIEF DESCRIPTION OF WHAT THE PROGRAM OR FUNCTION DOES
+# Takes in data about the initial state of a pendulum
+# system and outputs 3 graphs modelling the motion of
+# the pendulum.
 # ---------------------------------------------------
 #  Inputs
 # ---------------------------------------------------
