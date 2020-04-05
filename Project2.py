@@ -1,78 +1,98 @@
 # Project 2 Python Code
 
-from Force_Functions import air_form, air_friction, water_form, water_friction
-from math import pi
+import matplotlib.pyplot as plt
+#import seaborn as sns
 
-dt = 60 * 60  # time step of 1 hour
-T = 21 * 24 * 60 * 60  # total time of 30 days
+#sns.set()
 
-# motion values
-v_0 = 0
-x_0 = 0
-
-dist = 4500000
-
-water_needed = 10000000
+dt = 30 * 60  # time step of 1 hour
 
 p_air = 1.225
 p_water = 1030
 p_ice = 920
 
-a = 2 * dist / (T ** 2)
+c_air = 0.1
+c_water = 0.5
 
-print(a)
-print(a * 10000000000)
+v_c = 4
 
-melting_rate = 0.002  # m/s
-
-# tabular
-tab_w = 10
-tab_h = 10
-tab_l = 10
+def air_friction(A_wetted, v_app):
+    return(-1 / 2 * p_air * A_wetted * c_air * (v_app ** 2))
 
 
-def tab_mass(t):
-    V = (tab_w - melting_rate * t) * \
-        (tab_h - melting_rate * t) * (tab_l - melting_rate * t)
-    return(p_ice * V)
+def water_friction(A_wetted, v_app):
+    return(-1 / 2 * p_water * A_wetted * c_water * (v_app ** 2))
 
 
-# dome
-dome_r = 10
-dome_h = 10
+def air_form(A_frontal, v_app):
+    return(-1 / 2 * p_air * A_frontal * c_air * (v_app ** 2))
 
 
-def dome_mass(t):
-    V = (4 / 3 * pi * ((dome_r - melting_rate * t) ** 3))
-    V += (pi * ((dome_r - melting_rate * t) ** 2) * (dome_h - melting_rate * t))
-    return(p_ice * V)
+def water_form(A_frontal, v_app):
+    return(-1 / 2 * p_water * A_frontal * c_water * (v_app ** 2))
 
 
-# wedged
-wedge_ha = 10
-wedge_hb = 10
-wedge_l = 10
-wedge_w = 10
+def tow_force(A_wetted_air, A_wetted_water, A_frontal_air, A_frontal_water, v, mass, acc):
+    tow = mass * acc - air_friction(A_wetted_air, v) - water_friction(A_wetted_water, v - v_c) - \
+        air_form(A_frontal_air, v) - \
+        water_friction(A_frontal_water, v - v_c)
+    return(tow)
 
 
-def wedge_mass(t):
-    loss = melting_rate * t
-    V = (1 / 2 * (wedge_l - loss) * (wedge_ha - loss))
-    V += (wedge_hb - loss) * (wedge_l - loss) * (wedge_w - loss)
-    return(V)
+# motion values
 
+dist = 3750000
 
-# pinnacle
-pin_ha = 10
-pin_hb = 10
-pin_lw = 10
+water_needed = 1.25 * (10 ** 6) # in kL
 
+water_needed *= 1000 # coverting to kg
 
-def pin_mass(t):
-    loss = melting_rate * t
-    V = (1 / 3 * (pin_ha - loss) * (pin_lw - loss) * (pin_lw - loss))
-    V += (1 / 3 * (pin_hb - loss) * (pin_lw - loss) * (pin_lw - loss))
+melting_rate = 0.00002  # m/s
 
+def tow_force_time(T):
+    time = [i for i in range(0, T * 24 * 60 * 60, dt)]
 
-for i in range(0, T, dt):
-    pass
+    T_curr = T * 24 * 60 * 60
+    a = 2 * dist / ((T_curr) ** 2)
+
+    init_mass = (((water_needed / p_ice) ** (1 / 3) + melting_rate * T_curr) ** 3) * p_ice
+    
+    tab_w = ((water_needed / p_ice) ** (1 / 3) + melting_rate * T_curr)
+    tab_h = ((water_needed / p_ice) ** (1 / 3) + melting_rate * T_curr)
+    tab_l = ((water_needed / p_ice) ** (1 / 3) + melting_rate * T_curr)
+    
+    t_force = []
+    v = 0
+
+    print(tab_w)
+
+    def tab_mass(t):
+        V = (tab_w - melting_rate * t) * (tab_h - melting_rate * t) * (tab_l - melting_rate * t)
+        return(p_ice * V)
+
+    def tab_SA(t):
+        loss = melting_rate * t
+        wetted_air = 2 * 0.1 * (tab_h - loss) * (tab_l - loss) + (tab_l - loss) * (tab_w - loss)
+        frontal_air = 0.1 * (tab_h - loss) * (tab_w - loss)
+        wetted_water = 2 * 0.9 * (tab_h - loss) * (tab_l - loss) + (tab_l - loss) * (tab_w - loss)
+        frontal_water = 0.9 * (tab_h - loss) * (tab_w - loss)
+        return([wetted_air, frontal_air, wetted_water, frontal_water])
+
+    for i in time:
+        SA = tab_SA(i)
+        mass = tab_mass(i)
+
+        t_force.append(tow_force(SA[0], SA[2], SA[1], SA[3], v, mass, a))
+
+        v += a * dt
+        # print(v)
+
+    plt.figure(T)
+    plt.plot(time, t_force)
+    plt.title('Time: ' + str(T) + ' days')
+
+if __name__ == '__main__':
+    T_poss = [i for i in range(1, 102, 10)]
+    for i in T_poss:
+        tow_force_time(i)
+    plt.show()
