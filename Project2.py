@@ -42,13 +42,13 @@ def tow_force(A_wetted_air, A_wetted_water, A_frontal_air, A_frontal_water, v, m
 
 # motion values
 
-# water_needed = 374 * (10 ** 12) / 1000 * 0.2 * 0.12 # in kL
-# water_needed = 8976000000 # in kL
+# water_needed = 3.74 * (10 ** 12) / 1000 * 0.2 * 0.12 # in kL
+# water_needed = 89760000 # in kL (1/5 of CapeTown's Domestic Usage per year)
 
 water_needed = float(input('What is the volume of water needed in Cape Town (in kL)? '))
 
-#dist = 3750000
-dist = float(input('What is the distance to Cape Town? '))
+#dist = 3300000 in meters (1 way)
+dist = float(input('What is the distance to Cape Town (in m)? '))
 
 water_needed *= 1000  # converting to kg
 
@@ -86,6 +86,16 @@ def tow_force_time(T):
         wetted_water = 2 * 0.9 * (tab_h - 0.0000006886 * t) * (tab_l - loss) + (tab_l - loss) * (tab_w - loss)
         frontal_water = 0.9 * (tab_h - 0.0000006886 * t) * (tab_w - loss)
         return ([wetted_air, frontal_air, wetted_water, frontal_water])
+    
+    def totCost(T, t_force, tab_l, tab_w, tab_h):
+        numShips = (1 + int( max(t_force) / (309 * 9.8 * 1000 ) )) # Number of Ships needed
+        shipCost = ( (40000 * T) * numShips )                      # Cost of ALP Striker Usage
+        fuelCost = 1083806.4 * (int(T/45) + 1) * numShips          # Fuel cost (assumes complete fill for 45 days and that refill transport cost = $0)
+        netMeters = (16 * (.25 * tab_h)) + 2 * (( tab_w + 2*tab_l) + 2*(((tab_w / 2)**2 + 2000**2)**(0.5))) # Boat will tow 2km in front of iceberg
+        netCost = 112.53 * netMeters                               # Dyneema rope net design
+        laborCost = (13.91 * 12 * 35) * numShips * T               # Assumes full 35 mates working 12 hr / day @ $13.91 / hr  
+        cost = shipCost + fuelCost + netCost + laborCost
+        return(cost)
 
     for i in time:
         SA = tab_SA(i)
@@ -94,9 +104,18 @@ def tow_force_time(T):
         t_force.append(tow_force(SA[0], SA[2], SA[1], SA[3], v, mass, a))
 
         v += a * dt
+        
+    
     print('Days: ' + str(T) + ', final velocity: ' + str(v))
 
-    print('Days: ' + str(T) + ', max tow force: ' + str(max(t_force)) + '\n')
+    print('Days: ' + str(T) + ', max tow force: ' + str(max(t_force)) + ' N')
+    
+    totalCost = totCost(T, t_force, tab_l, tab_w, tab_h)
+    
+    print('Days:'  + str(T) + ', total cost: $'  + str(totalCost) + '\n')
+    
+
+    
 
     plt.figure(T)
     plt.plot(time, t_force)
