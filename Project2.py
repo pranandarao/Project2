@@ -121,15 +121,15 @@ def tow_force_time(T):
     
 
     plt.figure(T)
-    plt.plot(time, t_force)
-    plt.xlabel('Time (seconds)')
+    plt.plot([i / 86400 for i in time], t_force)
+    plt.xlabel('Time (days)')
     plt.ylabel('Towing Force (Newtons)')
     plt.title('Travel Time: ' + str(T) + ' days')
 
 
 if __name__ == '__main__':
-    T_poss = [i for i in range(10, 102, 10)]
-    # T_poss = [50]
+    #T_poss = [i for i in range(10, 102, 10)]
+    T_poss = [40]
     for i in T_poss:
         tow_force_time(i)
     plt.show()
