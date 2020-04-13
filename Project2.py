@@ -45,12 +45,12 @@ def tow_force(A_wetted_air, A_wetted_water, A_frontal_air, A_frontal_water, v, m
 # water_needed = 3.74 * (10 ** 12) / 1000 * 0.2 * 0.12 # in kL
 # water_needed = 89760000 # in kL (1/5 of CapeTown's Domestic Usage per year)
 
-water_needed = float(input('What is the volume of water needed in Cape Town (in kL)? '))
+water_neededkL = float(input('What is the volume of water needed in Cape Town (in kL)? '))
 
 #dist = 3300000 in meters (1 way)
 dist = float(input('What is the distance to Cape Town (in m)? '))
 
-water_needed *= 1000  # converting to kg
+water_needed = 1000 * water_neededkL # converting to kg
 
 melting_rate = 0.000002  # m/s
 
@@ -112,8 +112,11 @@ def tow_force_time(T):
     
     totalCost = totCost(T, t_force, tab_l, tab_w, tab_h)
     
-    print('Days:'  + str(T) + ', total cost: $'  + str(totalCost) + '\n')
+    print('Days: ' + str(T) + ', total cost: $'  + str(totalCost))
     
+    iceRetention = ((water_neededkL) / (tab_l * tab_w * tab_h)) * 100
+    
+    print('Days: ' + str(T) + ', ice volume retained: ' + str(iceRetention) + '% \n')
 
     
 
